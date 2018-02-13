@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head lang="en">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>IOTA Transaction Promotion</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+<body>
+<main role="main">
+  <div class="container">
+    <div id="promote-transaction">
+      <!--
+        <form class="form-group row">
+            <div class="col-xs-4">
+                <input type="text" class="form-control" id="hash" name="hash" placeholder="Enter your transaction hash..." />
+            </div>
+            <div class="col-xs-1">
+                <label for="interval">interval</label>
+                <input type="number" class="form-control" id="interval" name="interval" value="1" placeholder="Repeat interval in minutes (default: 1)" />
+            </div>
+            <button type="submit" class="btn btn-primary mb-2 mx-sm-3">Promote</button>
+        </form>-->
+        <form class="form-horizontal">
+          <fieldset>
+
+          <!-- Form Name -->
+          <legend>Promote Transaction</legend>
+
+          <!-- Text input-->
+          <div class="form-group">
+            <label class="col-md-4 control-label" for="textinput">Transaction Hash</label>
+            <div class="col-md-4">
+              <input id="hash" name="hash" placeholder="QSTYPIFWZHETDKQBTDWENTZFRWJGAJSXQBMATUHXORUBKWTXMPBETJHRQCYMVDUKXEZZTRT9RQAVZ9999" class="form-control input-md" required="" type="text">
+              <span class="form-text text-muted">Enter your transaction hash...</span>
+            </div>
+          </div>
+
+          <!-- Appended Input-->
+          <div class="form-group">
+            <label class="col-md-4 control-label" for="interval">Repeat interval</label>
+            <div class="col-md-4">
+              <div class="input-group">
+                <input id="interval" name="interval" class="form-control" required="" value="1" type="number">
+                <div class="input-group-append">
+                  <span class="input-group-text">minutes</span>
+                </div>
+              </div>
+              <p class="form-text text-muted">Repeat interval in minutes</p>
+            </div>
+          </div>
+          <!-- Button (Double) -->
+          <div class="form-group">
+            <div class="col-md-4">
+              <div id="button-start">
+                <button id="button1id" name="button1id" class="btn btn-primary">Start</button>
+              </div>
+              <div id="button-stop" style="display: none;">
+                <button id="button2id" name="button2id" class="btn btn-danger">Stop</button>
+              </div>
+            </div>
+          </div>
+
+          </fieldset>
+        </form>
+
+    </div>
+    <div id="promotions" class="mx-sm-3" style="display: none;">
+      <legend>Sent Transactions</legend>
+      <div class="list-group mx-md-3" id="lst">
+      </div>
+    </div>
+  </div>
+</main>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+var inter;
+
+$('#promote-transaction').submit(function () {
+  if (!inter) {
+    $('#button-start').hide()
+    $('#button-stop').show()
+    $('#promotions').show()
+    $('#lst').empty();
+    promoteTransaction($('#hash').val());
+    inter = setInterval(function() {promoteTransaction($('#hash').val());},$('#interval').val()*60000);
+  }
+  else {
+    clearInterval(inter);
+    inter = null;
+    $('#button-start').show()
+    $('#button-stop').hide()
+  }
+
+  return false;
+});
+
+$('#promote-transaction-stop').submit(function () {
+ stop();
+ return false;
+});
+
+function promote(hash, interval) {
+  promoteTransaction(hash);
+  inter = setInterval(function() {promoteTransaction(hash);},interval*60000);
+  $('#button-start').hide()
+  $('#button-stop').show()
+
+  // example
+	//var newEl = document.createElement('div');
+	//newEl.innerHTML = '<button type="submit" class="btn btn-primary mb-2 mx-sm-3">Stop</button>';
+
+  //var ref = document.getElementById('promotions');
+  //ref.parentNode.insertBefore(newEl, ref);
+}
+
+function stop() {
+  clearInterval(inter);
+  $('#button-start').show()
+  $('#button-stop').hide()
+
+  // example
+	//var newEl = document.createElement('div');
+	//newEl.innerHTML = '<button type="submit" class="btn btn-primary mb-2 mx-sm-3">Stop</button>';
+
+  //var ref = document.getElementById('promotions');
+  //ref.parentNode.insertBefore(newEl, ref);
+}
+// mimics server side push message received at front end
+// update list to contain only the last 5 elements
+function update_list(newtext){
+    // Fetch li elements in $('#lst')
+    // truncate last one
+    // $('#lst li').last().remove()
+
+    // insert new text to top of li list (ideally, I want to pass the new text to insert to this function)
+    $('#lst').append("<a class='list-group-item' href='https://iotasear.ch/transaction/"+newtext+"' target='_blank'>"+newtext+"</a>");
+
+    //alert('Got called')
+}
+</script>
+<script type="text/javascript" src="iota.min.js"></script>
+<script type="text/javascript">
+// Create IOTA instance directly with provider
+var iota = new IOTA({
+    'provider': 'https://iotanode.us:443'
+});
+
+// now you can start using all of the functions
+iota.api.getNodeInfo(function(error, success) {
+    if (error) {
+        console.error(error);
+    } else {
+        console.log(success);
+    }
+});
+
+// you can also get the version
+console.log(iota.version);
+
+const seed="FMSKAQTRPJRCYKREPKDXFJZWJXGNJUZLZUEKFRJAAWMUSDWUBSTRYVMFEAKS"
+const depth=3
+const minWeightMagnitude=14
+const spamTransfer = [{address: '9'.repeat(81), value: 0, message: '', tag: ''}]
+
+
+function promoteTransaction(phash) {
+  console.log('prom')
+  iota.api.promoteTransaction(
+    phash,
+    depth,
+    minWeightMagnitude,
+    spamTransfer,
+    {interrupt: false, delay: 0},
+    (err, res) => {
+      if (err) {
+        alert(JSON.stringify(err))
+        alert(err.message)
+      } else {
+        console.log(res)
+        update_list(res[0].hash)
+      }
+    }
+  )
+}
+
+function sendTransfer() {
+  console.log('test')
+  iota.api.sendTransfer(
+    seed,
+    depth,
+    minWeightMagnitude,
+    spamTransfer,
+    {interrupt: false, delay: 0},
+    (err, res) => {
+      if (err) {
+        alert(JSON.stringify(err))
+        alert(err.message)
+      } else {
+        alert(JSON.stringify(res))
+        promoteTransaction(res[0].hash);
+      }
+    }
+  );
+}
+</script>
+</body>
+</html>
